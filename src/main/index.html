@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="shortcut icon" href="#">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/addons/p5.sound.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <main>
+  </main>
+  <script type="module" src="js/drawBoard.js"></script>
+  <script type="module">
+    import { setup, preload } from "./js/index.js"
+    window.preload = preload;
+    window.setup = setup;
+  </script>
+</body>
+
+</html>
