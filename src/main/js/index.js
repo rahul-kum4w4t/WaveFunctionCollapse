@@ -19,7 +19,7 @@ const boardheight = 25;
 
 function preload() {
     for (let i = 0; i < IMAGE_NAMES.length; i++) {
-        imgObjs.push(loadImage(`../../resources/${IMAGE_NAMES[i]}.jpg`));
+        imgObjs.push(loadImage(`../resources/${IMAGE_NAMES[i]}.jpg`));
     }
     tileBoard = new TileBoard(boardWidth, boardheight, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS);
 }
