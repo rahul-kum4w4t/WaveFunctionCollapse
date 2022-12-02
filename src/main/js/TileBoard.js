@@ -105,4 +105,18 @@ export default class TileBoard {
             !(r - 1 >= 0 && this.board[r - 1][c] != null && !this.comparator(tile, 0, this.board[r - 1][c])) &&
             !(c - 1 >= 0 && this.board[r][c - 1] != null && !this.comparator(tile, 3, this.board[r][c - 1]));
     }
+
+
+    /**
+     * Draws tile images on the canvas
+     */
+    draw() {
+        for (let i = 0; i < this.boardHeight; i++) {
+            for (let j = 0; j < this.boardWidth; j++) {
+                if (this.board[i][j]) {
+                    image(this.board[i][j].imgObj, j * this.boardHeight, i * this.boardWidth, this.boardWidth, this.boardHeight);
+                }
+            }
+        }
+    }
 }

@@ -36,18 +36,10 @@ function preload() {
 
 // Canvas method for setting up the view
 function setup() {
-
     let c = createCanvas(windowWidth, windowHeight);
-    tileBoard.fixBoard();
     background(200);
-
-    for (let i = 0; i < boardheight; i++) {
-        for (let j = 0; j < boardWidth; j++) {
-            if (tileBoard.board[i][j]) {
-                image(tileBoard.board[i][j].imgObj, j * tileHeight, i * tileWidth, tileWidth, tileHeight);
-            }
-        }
-    }
+    tileBoard.fixBoard();
+    tileBoard.draw();
     //saveCanvas(c, 'myCanvas', 'jpg');
 }
 
