@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 
 const app = express();
 
@@ -8,6 +8,7 @@ app.get("/", (req, res) => {
     res.send("Welcome to Wave function collapse server");
 });
 
+// Starting server
 app.listen(3000, err => {
     if (err) {
         return console.error("error" + err.stack);

@@ -1,43 +1,54 @@
 import Tile from "../main/js/Tile.js";
 import TileBoard from "../main/js/TileBoard.js";
 
-
 // Change as per requirement
-const IMAGE_NAMES = ["tile_none", "tile_rdl"];
-const IMAGE_SOCKETS = [
-    [0, 0, 0, 0],
-    [0, 1, 1, 1]
-];
-const imgObjs = [{}, {}];
-let boardWidth = 5;
-let boardheight = 5;
+const configObject = {
+    boardWidth: 5,
+    boardHeight: 5,
+    tileWidth: 25,
+    tileHeight: 25,
+    imageNames: ["tile_none", "tile_rdl"],
+    imageObjects: [{}, {}],
+    imageSockets: [
+        [0, 0, 0, 0],
+        [0, 1, 1, 1]
+    ]
+}
 
 describe("TileBoard object test cases", () => {
 
     it("(Positive) TileBoard object creation", () => {
-        expect(() => new TileBoard(boardWidth, boardheight, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS)).not.toThrow(Error);
+        expect(() => new TileBoard(configObject)).not.toThrow(Error);
     });
 
     it("(Negative) TileBoard object creation", () => {
-        expect(() => new TileBoard(0, boardheight, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS)).toThrow(Error);
-        expect(() => new TileBoard(boardWidth, "boardHeight", IMAGE_NAMES, imgObjs, IMAGE_SOCKETS)).toThrow(Error);
-        expect(() => new TileBoard(1.12, "boardHeight", IMAGE_NAMES, imgObjs, IMAGE_SOCKETS)).toThrow(Error);
-        expect(() => new TileBoard(boardWidth, boardheight, null, imgObjs, IMAGE_SOCKETS)).toThrow(Error);
-        expect(() => new TileBoard(boardWidth, boardheight, IMAGE_NAMES, [], IMAGE_SOCKETS)).toThrow(Error);
-        expect(() => new TileBoard(boardWidth, boardheight, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS, null)).toThrow(Error);
+        expect(() => new TileBoard({ ...configObject, boardWidth: 0 })).toThrow(Error);
+        expect(() => new TileBoard({ ...configObject, boardHeight: "boardHeight" })).toThrow(Error);
+        expect(() => new TileBoard({ ...configObject, boardWidth: 1.20 })).toThrow(Error);
+        expect(() => new TileBoard({ ...configObject, imageNames: null })).toThrow(Error);
+        expect(() => new TileBoard({ ...configObject, imageObjects: [] })).toThrow(Error);
+        expect(() => new TileBoard({ ...configObject, comparator: null })).toThrow(Error);
     });
 
     it("(Positive) Properties setting after TileBoard object creation", () => {
-        let tileBoard = new TileBoard(2, 2, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS);
-        expect(tileBoard).toHaveProperty('boardWidth', 2);
-        expect(tileBoard).toHaveProperty('boardHeight', 2);
+        let tileBoard = new TileBoard(configObject);
+        expect(tileBoard).toHaveProperty('boardWidth', configObject.boardWidth);
+        expect(tileBoard).toHaveProperty('boardHeight', configObject.boardHeight);
+        expect(tileBoard).toHaveProperty('tileWidth', configObject.tileWidth);
+        expect(tileBoard).toHaveProperty('tileHeight', configObject.tileHeight);
         expect(tileBoard).toHaveProperty('shuffledTiles');
         expect(tileBoard).toHaveProperty('comparator', Tile.isCompatible);
-        expect(tileBoard).toHaveProperty('board', new Array(2).fill(0).map(() => new Array(2).fill(null)));
+        expect(tileBoard).toHaveProperty('distinctTilesCount', 2);
+        expect(tileBoard).toHaveProperty('board', new Array(configObject.boardHeight).fill(0).map(() => new Array(configObject.boardWidth).fill(null)));
     });
 
-    it("(Positive) 'fillBoard' method", () => {
-        let tileBoard = new TileBoard(2, 2, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS);
-        expect(tileBoard.fixBoard()).toBe(true);
+    it("(Positive) 'fixBoard' method", () => {
+        let tileBoard = new TileBoard(configObject);
+        tileBoard.fixBoard();
+        for (let rowArr of tileBoard.board) {
+            for (let tile of rowArr) {
+                expect(tile).toBeInstanceOf(Tile);
+            }
+        }
     });
 });

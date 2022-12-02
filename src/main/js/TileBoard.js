@@ -2,8 +2,6 @@ import Tile from "./Tile.js";
 import { shuffleArray } from "../../lib/arrayUtils.js";
 import { getRandIntInRangeExcUpBound } from "../../lib/numbers.js";
 
-const SHUFFLED_TILES_COUNT = 10;
-
 /**
  * M x N board which holds all the tiles
  */
@@ -14,26 +12,35 @@ export default class TileBoard {
      * @param {integer} width Width of board
      * @param {integer} height Height of Board
      * @param {string} imgNames All the image names
-     * @param {object} imgObjs All the image objects
+     * @param {object} imageObjects All the image objects
      * @param {array} imgSockets All the image sockets
      * @param {function} comparator comparator which compares any socket of two tiles
      */
-    constructor(width, height, imgNames, imgObjs, imgSockets, comparator = Tile.isCompatible) {
+    constructor({ boardWidth, boardHeight, tileWidth, tileHeight, imageNames, imageObjects, imageSockets, comparator = Tile.isCompatible }) {
 
-        if (Number.isInteger(width) && Number.isInteger(height) && width > 0 && height > 0) {
-            this.boardWidth = width;
-            this.boardHeight = height;
+        if (
+            Number.isInteger(boardWidth) && Number.isInteger(boardHeight) && Number.isInteger(tileWidth) && Number.isInteger(tileHeight) &&
+            boardWidth > 0 && boardHeight > 0 && tileWidth > 0 && tileHeight > 0
+        ) {
+            this.boardWidth = boardWidth;
+            this.boardHeight = boardHeight;
+            this.tileWidth = tileWidth;
+            this.tileHeight = tileHeight;
         } else {
-            throw new TypeError("width and height of the board must be integers and greater than 0");
-
+            throw new TypeError("width and height of the board and tiles must be integers and greater than 0");
         }
 
-        if (Array.isArray(imgNames) && Array.isArray(imgObjs) && Array.isArray(imgSockets) && (imgNames.length == imgObjs.length && imgSockets.length)) {
+        if (
+            Array.isArray(imageNames) && Array.isArray(imageObjects) && Array.isArray(imageSockets) &&
+            (imageNames.length == imageObjects.length) && (imageNames.length == imageSockets.length) &&
+            imageNames.length > 0
+        ) {
             const tiles = [];
-            for (let i = 0; i < imgNames.length; i++) {
-                tiles.push(new Tile(imgNames[i], imgObjs[i], imgSockets[i]));
+            for (let i = 0; i < imageNames.length; i++) {
+                tiles.push(new Tile(imageNames[i], imageObjects[i], imageSockets[i]));
             }
-            this.shuffledTiles = new Array(SHUFFLED_TILES_COUNT).fill(0).map(() => shuffleArray([...tiles]));
+            this.distinctTilesCount = imageNames.length;
+            this.shuffledTiles = new Array(this.distinctTilesCount > 1 && this.distinctTilesCount <= 10 ? this.distinctTilesCount : 10).fill(0).map(() => shuffleArray([...tiles]));
         } else {
             throw new TypeError("imagenames, imageobjects and imagesockets must be arrays and of equal length");
         }
@@ -44,51 +51,50 @@ export default class TileBoard {
             throw new TypeError("Comparator passed, must be a function");
         }
 
-        this.board = new Array(height).fill(0).map(() => new Array(width).fill(null));
+        this.board = new Array(this.boardHeight).fill(0).map(() => new Array(this.boardWidth).fill(null));
     }
 
     /**
      * Try to fit each tile on the board in recursive manner
-     * @param {integer} r 
-     * @param {integer} c 
-     * @returns true/false
      */
-    fixBoard(r = 0, c = 0) {
-        let tiles = this.shuffledTiles[getRandIntInRangeExcUpBound(0, this.shuffledTiles.length)];
-        for (let i = 0; i < tiles.length; i++) {
-            if (this.isCompatible(r, c, tiles[i])) {
-                this.board[r][c] = tiles[i];
+    fixBoard() {
 
-                if (c + 1 < this.boardWidth && this.board[r][c + 1] == null) {
-                    if (!this.fixBoard(r, c + 1)) {
-                        this.board[r][c] = null;
+        const stack = [];
+        let isNotComplete = true;
+        let r = 0;
+        let c = 0;
+        let i = 0;
+        let tiles = this.shuffledTiles[0];
+
+        while (isNotComplete) {
+            while (i < this.distinctTilesCount) {
+                if (this.isCompatible(r, c, tiles[i])) {
+                    this.board[r][c] = tiles[i];
+                    stack.push([r, c, tiles, i]);
+                    i = 0;
+                    tiles = this.shuffledTiles[getRandIntInRangeExcUpBound(0, this.shuffledTiles.length)];
+
+                    if (c + 1 < this.boardWidth && this.board[r][c + 1] == null) {
+                        c++;
+                    } else if (c - 1 >= 0 && this.board[r][c - 1] == null) {
+                        c--;
+                    } else if (r + 1 < this.boardHeight && this.board[r + 1][c] == null) {
+                        r++;
+                    } else if (r - 1 >= 0 && this.board[r - 1][c] == null) {
+                        r--;
                     } else {
-                        return true;
-                    }
-                } else if (c - 1 >= 0 && this.board[r][c - 1] == null) {
-                    if (!this.fixBoard(r, c - 1)) {
-                        this.board[r][c] = null;
-                    } else {
-                        return true;
-                    }
-                } else if (r + 1 < this.boardHeight && this.board[r + 1][c] == null) {
-                    if (!this.fixBoard(r + 1, c)) {
-                        this.board[r][c] = null;
-                    } else {
-                        return true;
-                    }
-                } else if (r - 1 >= 0 && this.board[r - 1][c] == null) {
-                    if (!this.fixBoard(r - 1, c)) {
-                        this.board[r][c] = null;
-                    } else {
-                        return true;
+                        isNotComplete = false;
                     }
                 } else {
-                    return true;
+                    i++;
                 }
             }
+            if (isNotComplete && i == this.distinctTilesCount) {
+                [r, c, tiles, i] = stack.pop();
+                this.board[r][c] = null;
+                i++;
+            }
         }
-        return false;
     }
 
     /**
@@ -100,8 +106,9 @@ export default class TileBoard {
      */
     isCompatible(r, c, tile) {
 
-        return !(r + 1 < this.board.length && this.board[r + 1][c] != null && !this.comparator(tile, 2, this.board[r + 1][c])) &&
-            !(c + 1 < this.board[r].length && this.board[r][c + 1] != null && !this.comparator(tile, 1, this.board[r][c + 1])) &&
+        return this.board[r][c] == null &&
+            !(r + 1 < this.boardHeight && this.board[r + 1][c] != null && !this.comparator(tile, 2, this.board[r + 1][c])) &&
+            !(c + 1 < this.boardWidth && this.board[r][c + 1] != null && !this.comparator(tile, 1, this.board[r][c + 1])) &&
             !(r - 1 >= 0 && this.board[r - 1][c] != null && !this.comparator(tile, 0, this.board[r - 1][c])) &&
             !(c - 1 >= 0 && this.board[r][c - 1] != null && !this.comparator(tile, 3, this.board[r][c - 1]));
     }
@@ -114,7 +121,7 @@ export default class TileBoard {
         for (let i = 0; i < this.boardHeight; i++) {
             for (let j = 0; j < this.boardWidth; j++) {
                 if (this.board[i][j]) {
-                    image(this.board[i][j].imgObj, j * this.boardHeight, i * this.boardWidth, this.boardWidth, this.boardHeight);
+                    image(this.board[i][j].imgObj, j * this.tileWidth, i * this.tileHeight, this.tileWidth, this.tileHeight);
                 }
             }
         }

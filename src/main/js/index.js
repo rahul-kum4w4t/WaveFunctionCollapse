@@ -20,7 +20,7 @@ const tileHeight = 25;
 let tileBoard = null;
 const imgObjs = [];
 let boardWidth = 0; // (will fit to entire screen width)
-let boardheight = 0;//  (will fit to entire screen height)
+let boardHeight = 0;//  (will fit to entire screen height)
 
 
 // Preload images and save in array
@@ -30,8 +30,16 @@ function preload() {
     }
     // Adjusting board width and height according to screen width and height
     boardWidth = Math.ceil(windowWidth / tileWidth);
-    boardheight = Math.ceil(windowHeight / tileHeight);
-    tileBoard = new TileBoard(boardWidth, boardheight, IMAGE_NAMES, imgObjs, IMAGE_SOCKETS);
+    boardHeight = Math.ceil(windowHeight / tileHeight);
+    tileBoard = new TileBoard({
+        boardWidth,
+        boardHeight,
+        tileWidth,
+        tileHeight,
+        imageNames: IMAGE_NAMES,
+        imageObjects: imgObjs,
+        imageSockets: IMAGE_SOCKETS
+    });
 }
 
 // Canvas method for setting up the view
@@ -39,6 +47,7 @@ function setup() {
     let c = createCanvas(windowWidth, windowHeight);
     background(200);
     tileBoard.fixBoard();
+    console.log(JSON.stringify(tileBoard));
     tileBoard.draw();
     //saveCanvas(c, 'myCanvas', 'jpg');
 }
