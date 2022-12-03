@@ -1,20 +1,10 @@
 import TileBoard from "./TileBoard.js";
+import data from "./data.js";
 
 // Change as per requirement
-const IMAGE_NAMES = ["tile_none", "tile_rdl", "tile_rl", "tile_ud", "tile_uld", "tile_urd", "tile_url", "tile_plus"];
-const IMAGE_SOCKETS = [
-    [0, 0, 0, 0],
-    [0, 1, 1, 1],
-    [0, 1, 0, 1],
-    [1, 0, 1, 0],
-    [1, 0, 1, 1],
-    [1, 1, 1, 0],
-    [1, 1, 0, 1],
-    [1, 1, 1, 1]
-];
-const tileWidth = 25;
-const tileHeight = 25;
-
+const tileWidth = 20;
+const tileHeight = 20;
+let tilesType = "maze";
 
 // Do not change
 let tileBoard = null;
@@ -25,20 +15,24 @@ let boardHeight = 0;//  (will fit to entire screen height)
 
 // Preload images and save in array
 function preload() {
-    for (let i = 0; i < IMAGE_NAMES.length; i++) {
-        imgObjs.push(loadImage(`../resources/${IMAGE_NAMES[i]}.jpg`));
+    const { imageNames, imageSockets, imgFileExt, comparator } = data[tilesType];
+
+    for (let i = 0; i < imageNames.length; i++) {
+        imgObjs.push(loadImage(`../resources/${tilesType}/${imageNames[i]}.${imgFileExt}`));
     }
     // Adjusting board width and height according to screen width and height
     boardWidth = Math.ceil(windowWidth / tileWidth);
     boardHeight = Math.ceil(windowHeight / tileHeight);
+    console.log("Comparator: ",comparator);
     tileBoard = new TileBoard({
         boardWidth,
         boardHeight,
         tileWidth,
         tileHeight,
-        imageNames: IMAGE_NAMES,
+        imageNames,
         imageObjects: imgObjs,
-        imageSockets: IMAGE_SOCKETS
+        imageSockets,
+        comparator
     });
 }
 
@@ -47,7 +41,6 @@ function setup() {
     let c = createCanvas(windowWidth, windowHeight);
     background(200);
     tileBoard.fixBoard();
-    console.log(JSON.stringify(tileBoard));
     tileBoard.draw();
     //saveCanvas(c, 'myCanvas', 'jpg');
 }

@@ -19,15 +19,13 @@ export default class TileBoard {
     constructor({ boardWidth, boardHeight, tileWidth, tileHeight, imageNames, imageObjects, imageSockets, comparator = Tile.isCompatible }) {
 
         if (
-            Number.isInteger(boardWidth) && Number.isInteger(boardHeight) && Number.isInteger(tileWidth) && Number.isInteger(tileHeight) &&
-            boardWidth > 0 && boardHeight > 0 && tileWidth > 0 && tileHeight > 0
+            Number.isInteger(boardWidth) && Number.isInteger(boardHeight) &&
+            boardWidth > 0 && boardHeight > 0
         ) {
             this.boardWidth = boardWidth;
             this.boardHeight = boardHeight;
-            this.tileWidth = tileWidth;
-            this.tileHeight = tileHeight;
         } else {
-            throw new TypeError("width and height of the board and tiles must be integers and greater than 0");
+            throw new TypeError("width and height of the board must be integers and greater than 0");
         }
 
         if (
@@ -37,7 +35,7 @@ export default class TileBoard {
         ) {
             const tiles = [];
             for (let i = 0; i < imageNames.length; i++) {
-                tiles.push(new Tile(imageNames[i], imageObjects[i], imageSockets[i]));
+                tiles.push(new Tile(imageNames[i], imageObjects[i], imageSockets[i], tileWidth, tileHeight));
             }
             this.distinctTilesCount = imageNames.length;
             this.shuffledTiles = new Array(this.distinctTilesCount > 1 && this.distinctTilesCount <= 10 ? this.distinctTilesCount : 10).fill(0).map(() => shuffleArray([...tiles]));
@@ -90,9 +88,13 @@ export default class TileBoard {
                 }
             }
             if (isNotComplete && i == this.distinctTilesCount) {
-                [r, c, tiles, i] = stack.pop();
-                this.board[r][c] = null;
-                i++;
+                if (stack.length > 0) {
+                    [r, c, tiles, i] = stack.pop();
+                    this.board[r][c] = null;
+                    i++;
+                } else {
+                    throw new Error("Not Solvable");
+                }
             }
         }
     }
@@ -121,7 +123,8 @@ export default class TileBoard {
         for (let i = 0; i < this.boardHeight; i++) {
             for (let j = 0; j < this.boardWidth; j++) {
                 if (this.board[i][j]) {
-                    image(this.board[i][j].imgObj, j * this.tileWidth, i * this.tileHeight, this.tileWidth, this.tileHeight);
+                    let tile = this.board[i][j];
+                    image(tile.imgObj, j * tile.width, i * tile.height, tile.width, tile.height);
                 }
             }
         }

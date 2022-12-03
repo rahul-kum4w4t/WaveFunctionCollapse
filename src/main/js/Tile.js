@@ -3,8 +3,8 @@
  */
 export default class Tile {
 
-    constructor(imgName, imgObj, imgSockets) {
-        
+    constructor(imgName, imgObj, imgSockets, width, height) {
+
         if (imgObj) {
             this.imgObj = imgObj;
         } else {
@@ -12,8 +12,18 @@ export default class Tile {
         }
         if (Array.isArray(imgSockets) && imgSockets.length == 4) {
             this.sockets = [...imgSockets];
-        }else{
+        } else {
             throw new TypeError("Image sockets passed to the constructor as third argument must be an array of length 4");
+        }
+
+        if (
+            Number.isInteger(width) && Number.isInteger(height) &&
+            width > 0 && height > 0
+        ) {
+            this.width = width;
+            this.height = height;
+        } else {
+            throw new TypeError("width and height of the tiles must be integers and greater than 0");
         }
 
         this.imgName = imgName ? imgName : "Tile_Img";

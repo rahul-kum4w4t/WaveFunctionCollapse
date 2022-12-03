@@ -34,8 +34,6 @@ describe("TileBoard object test cases", () => {
         let tileBoard = new TileBoard(configObject);
         expect(tileBoard).toHaveProperty('boardWidth', configObject.boardWidth);
         expect(tileBoard).toHaveProperty('boardHeight', configObject.boardHeight);
-        expect(tileBoard).toHaveProperty('tileWidth', configObject.tileWidth);
-        expect(tileBoard).toHaveProperty('tileHeight', configObject.tileHeight);
         expect(tileBoard).toHaveProperty('shuffledTiles');
         expect(tileBoard).toHaveProperty('comparator', Tile.isCompatible);
         expect(tileBoard).toHaveProperty('distinctTilesCount', 2);
