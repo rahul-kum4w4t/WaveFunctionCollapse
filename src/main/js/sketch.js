@@ -18,7 +18,7 @@ function preload() {
     const { imageNames, imageSockets, imgFileExt, comparator } = data[tilesType];
 
     for (let i = 0; i < imageNames.length; i++) {
-        imgObjs.push(loadImage(`../resources/${tilesType}/${imageNames[i]}.${imgFileExt}`));
+        imgObjs.push(loadImage(`./src/resources/${tilesType}/${imageNames[i]}.${imgFileExt}`));
     }
     // Adjusting board width and height according to screen width and height
     boardWidth = Math.ceil(windowWidth / tileWidth);

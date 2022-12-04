@@ -1,5 +1,4 @@
 import Tile from "./Tile.js"
-const ORIENT = Tile.orientations;
 
 export default {
     maze: {

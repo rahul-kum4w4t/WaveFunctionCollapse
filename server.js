@@ -2,7 +2,7 @@ import express from "express";
 
 const app = express();
 
-app.use(express.static('src'));
+app.use(express.static('.'));
 
 app.get("/", (req, res) => {
     res.send("Welcome to Wave function collapse server");
